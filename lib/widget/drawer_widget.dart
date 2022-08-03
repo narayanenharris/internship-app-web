@@ -51,7 +51,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.dashboard_customize_rounded),
+            leading: const Icon(Icons.query_stats),
             iconColor: Colors.white,
             onTap: () {},
             title: const Text(
