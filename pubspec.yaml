@@ -12,17 +12,12 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  flutter_svg: ^1.1.0
   intl: ^0.17.0
-  simple_animations: ^3.0.0
-  flutter_native_splash: ^2.2.6
-
-  sms_autofill: ^2.2.0
+  pinput: ^2.2.11
   firebase_core: ^1.20.0
   firebase_auth: ^3.6.1
-  google_fonts: ^3.0.1
-  pin_code_fields: ^7.4.0
-  intl_phone_field: ^3.1.0
+  cloud_firestore: ^3.4.3
+  provider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,26 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:app/pages/member_login.dart';
-import 'package:app/pages/business_login.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
 
   void _onMemberLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MemberLoginPage(),
-      ),
-    );
+    Navigator.pushNamed(context, '/member-login');
   }
 
   void _onBusinessLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BusinessLoginPage(),
-      ),
-    );
+    Navigator.pushNamed(context, '/business-login');
   }
 
   @override

@@ -1,32 +1,34 @@
-import 'package:sms_autofill/sms_autofill.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:app/utils/validation.dart';
+import 'package:app/models/user.dart';
 import 'package:app/pages/otp_verify.dart';
+import 'package:app/utils/validation.dart';
+import 'package:app/utils/helper.dart';
+import 'package:app/utils/authentication_service.dart';
 import 'package:app/styles/buttton.dart';
 
 class BusinessSignupPage extends StatefulWidget {
   BusinessSignupPage({Key? key}) : super(key: key);
 
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
   @override
   State<BusinessSignupPage> createState() => _BusinessSignupPageState();
 }
 
 class _BusinessSignupPageState extends State<BusinessSignupPage> {
-  bool _isHidden = true;
-  String? _mobileError;
-  String? _dropDownError;
-  final _fullNameInput = TextEditingController();
-  final _dateOfBirthInput = TextEditingController();
-  final _mobileInput = TextEditingController();
-  final _emailInput = TextEditingController();
-  final _passwordInput = TextEditingController();
-  final _confirmPasswordInput = TextEditingController();
-  final _referralCodeInput = TextEditingController();
-  String? _currentSelectedValue;
+  late AuthenticationService authService;
+  bool isPasswordHidden = true;
+  String? dropDownError;
+  final fullNameTextController = TextEditingController();
+  final dateOfBirthTextController = TextEditingController();
+  final mobileTextController = TextEditingController();
+  final emailTextController = TextEditingController();
+  final passwordTextController = TextEditingController();
+  final confirmPasswordTextController = TextEditingController();
+  final referralCodeTextController = TextEditingController();
+  String? currentSelectedValue;
 
   final _categories = [
     "Hotel",
@@ -55,68 +57,71 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
     "Beach Resort"
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    authService = context.read<AuthenticationService>();
+  }
+
   void onSignup(BuildContext context) async {
     setState(() {
-      if (_currentSelectedValue == null) {
-        _dropDownError = 'Select a category';
+      if (currentSelectedValue == null) {
+        dropDownError = 'Select a category';
       } else {
-        _dropDownError = null;
+        dropDownError = null;
       }
-
-      _mobileError = validateMobile(_mobileInput.text);
     });
 
-    if (_dropDownError != null || _mobileError != null) {
+    if (dropDownError != null) {
       return;
     }
 
-    if (widget._formKey.currentState?.validate() == true) {
-      UserCredential? user;
+    if (widget.formKey.currentState?.validate() == true) {
+      UserObject? user;
 
       try {
-        user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailInput.text,
-          password: _passwordInput.text,
+        user = await authService.signUp(
+          email: emailTextController.text.trim(),
+          password: passwordTextController.text.trim(),
+          displayName: fullNameTextController.text.trim(),
+          dateOfBirth: dateOfBirthTextController.text.trim(),
+          referralCode: referralCodeTextController.text.trim(),
+          accountType: AccountType.business,
+          category: currentSelectedValue,
         );
-
-        await user.user?.updateDisplayName(_fullNameInput.text);
       } catch (error) {
-        user = null;
-        showSnackBarText(error.toString());
+        showSnackbar(context, error.toString());
       }
 
       if (!mounted || user == null) return;
 
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => OtpVerifyPage(
-            fullName: _fullNameInput.text,
-            dateOfBirth: _dateOfBirthInput.text,
-            email: _emailInput.text,
-            mobile: _mobileInput.text,
-            password: _passwordInput.text,
-            referralCode: _referralCodeInput.text,
-            user: user!,
-          ),
+      Navigator.pushNamed(
+        context,
+        '/otp-verify',
+        arguments: OtpVerifyPageArguments(
+          user: user,
+          mobile: mobileTextController.text,
+          password: passwordTextController.text,
         ),
       );
     }
   }
 
-  void _togglePasswordView() {
+  void togglePasswordView() {
     setState(() {
-      _isHidden = !_isHidden;
+      isPasswordHidden = !isPasswordHidden;
     });
   }
 
-  void _setDateInput(DateTime dateTime) {
+  void setDateInput(DateTime dateTime) {
     setState(() {
-      _dateOfBirthInput.text = DateFormat('dd-MM-yyyy').format(dateTime);
+      dateOfBirthTextController.text =
+          DateFormat('dd-MM-yyyy').format(dateTime);
     });
   }
 
-  void _onLoginPress(BuildContext context) {
-    Navigator.of(context).pop();
+  void onLoginPress(BuildContext context) {
+    Navigator.pop(context);
   }
 
   @override
@@ -141,28 +146,28 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                 ),
                 const Padding(padding: EdgeInsets.all(16.0)),
                 Form(
-                  key: widget._formKey,
+                  key: widget.formKey,
                   child: Column(
                     children: [
                       FormField<String>(
                         builder: (FormFieldState<String> state) {
                           return InputDecorator(
                             decoration: InputDecoration(
-                              errorText: _dropDownError,
+                              errorText: dropDownError,
                               hintText: 'Select Category',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                               ),
                             ),
-                            isEmpty: _currentSelectedValue == '',
+                            isEmpty: currentSelectedValue == '',
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
-                                value: _currentSelectedValue,
+                                value: currentSelectedValue,
                                 hint: const Text('Select Category'),
                                 isDense: true,
                                 onChanged: (String? newValue) {
                                   setState(() {
-                                    _currentSelectedValue = newValue;
+                                    currentSelectedValue = newValue;
                                     state.didChange(newValue);
                                   });
                                 },
@@ -186,7 +191,7 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                       const Padding(padding: EdgeInsets.all(8.0)),
                       TextFormField(
                         validator: validateFullName,
-                        controller: _fullNameInput,
+                        controller: fullNameTextController,
                         keyboardType: TextInputType.name,
                         textCapitalization: TextCapitalization.words,
                         decoration: InputDecoration(
@@ -211,7 +216,7 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                       const Padding(padding: EdgeInsets.all(8.0)),
                       TextFormField(
                         validator: validateDateOfBirth,
-                        controller: _dateOfBirthInput,
+                        controller: dateOfBirthTextController,
                         keyboardType: TextInputType.datetime,
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(
@@ -261,13 +266,14 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                             },
                           );
                           if (pickedDate != null) {
-                            _setDateInput(pickedDate);
+                            setDateInput(pickedDate);
                           }
                         },
                       ),
                       const Padding(padding: EdgeInsets.all(8.0)),
-                      PhoneFieldHint(
-                        controller: _mobileInput,
+                      TextFormField(
+                        controller: mobileTextController,
+                        validator: validateMobile,
                         decoration: InputDecoration(
                           prefixText: "+91",
                           border: const OutlineInputBorder(
@@ -276,7 +282,6 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                             ),
                           ),
                           labelText: 'Mobile',
-                          errorText: _mobileError,
                           focusedBorder: OutlineInputBorder(
                             borderSide: const BorderSide(
                               color: Colors.black87,
@@ -291,7 +296,7 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                       ),
                       const Padding(padding: EdgeInsets.all(8.0)),
                       TextFormField(
-                        controller: _emailInput,
+                        controller: emailTextController,
                         validator: validateEmail,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
@@ -317,8 +322,8 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                       const Padding(padding: EdgeInsets.all(8.0)),
                       TextFormField(
                         validator: validatePassword,
-                        controller: _passwordInput,
-                        obscureText: _isHidden,
+                        controller: passwordTextController,
+                        obscureText: isPasswordHidden,
                         keyboardType: TextInputType.visiblePassword,
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(
@@ -329,12 +334,12 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                           labelText: 'Password',
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _isHidden
+                              isPasswordHidden
                                   ? Icons.visibility
                                   : Icons.visibility_off,
                               color: Colors.black54,
                             ),
-                            onPressed: _togglePasswordView,
+                            onPressed: togglePasswordView,
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: const BorderSide(
@@ -352,10 +357,10 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                       TextFormField(
                         validator: (value) => validateConfirmPassword(
                           value,
-                          _passwordInput.text,
+                          passwordTextController.text,
                         ),
-                        controller: _confirmPasswordInput,
-                        obscureText: _isHidden,
+                        controller: confirmPasswordTextController,
+                        obscureText: isPasswordHidden,
                         keyboardType: TextInputType.visiblePassword,
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(
@@ -366,12 +371,12 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                           labelText: 'Confirm Password',
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _isHidden
+                              isPasswordHidden
                                   ? Icons.visibility
                                   : Icons.visibility_off,
                               color: Colors.black54,
                             ),
-                            onPressed: _togglePasswordView,
+                            onPressed: togglePasswordView,
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: const BorderSide(
@@ -387,7 +392,7 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                       ),
                       const Padding(padding: EdgeInsets.all(8.0)),
                       TextFormField(
-                        controller: _referralCodeInput,
+                        controller: referralCodeTextController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(
@@ -430,7 +435,7 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                       style: TextStyle(fontSize: 16.0),
                     ),
                     TextButton(
-                      onPressed: () => _onLoginPress(context),
+                      onPressed: () => onLoginPress(context),
                       style: TextButton.styleFrom(
                         primary: const Color.fromARGB(255, 255, 0, 0),
                       ),
@@ -451,21 +456,13 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
 
   @override
   void dispose() {
-    _fullNameInput.dispose();
-    _emailInput.dispose();
-    _mobileInput.dispose();
-    _passwordInput.dispose();
-    _confirmPasswordInput.dispose();
-    _dateOfBirthInput.dispose();
-    _referralCodeInput.dispose();
+    fullNameTextController.dispose();
+    emailTextController.dispose();
+    mobileTextController.dispose();
+    passwordTextController.dispose();
+    confirmPasswordTextController.dispose();
+    dateOfBirthTextController.dispose();
+    referralCodeTextController.dispose();
     super.dispose();
-  }
-
-  void showSnackBarText(String text) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-      ),
-    );
   }
 }

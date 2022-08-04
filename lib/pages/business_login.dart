@@ -1,67 +1,82 @@
+import 'package:app/utils/authentication_service.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:app/pages/business_signup.dart';
 import 'package:app/styles/buttton.dart';
 import 'package:app/utils/validation.dart';
+import 'package:app/utils/helper.dart';
+import 'package:provider/provider.dart';
 
 class BusinessLoginPage extends StatefulWidget {
   BusinessLoginPage({Key? key}) : super(key: key);
 
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
   @override
   State<BusinessLoginPage> createState() => _BusinessLoginPageState();
 }
 
 class _BusinessLoginPageState extends State<BusinessLoginPage> {
-  bool _isHidden = true;
-  bool _rememberChecked = false;
+  late AuthenticationService authService;
+  bool isPasswordHidden = true;
+  bool rememberChecked = false;
 
-  final _emailInput = TextEditingController();
-  final _passwordInput = TextEditingController();
+  final emailTextController = TextEditingController();
+  final passwordTextController = TextEditingController();
 
-  void _togglePasswordView() {
+  @override
+  void initState() {
+    super.initState();
+    authService = context.read<AuthenticationService>();
+  }
+
+  void togglePasswordView() {
     setState(() {
-      _isHidden = !_isHidden;
+      isPasswordHidden = !isPasswordHidden;
     });
   }
 
-  void _setRemember(bool? value) {
+  void setRemember(bool? value) {
     setState(() {
-      _rememberChecked = value ?? false;
+      rememberChecked = value ?? false;
     });
   }
 
-  void _onLogin() async {
-    if (widget._formKey.currentState?.validate() == true) {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailInput.text,
-        password: _passwordInput.text,
-      );
+  void onLogin() async {
+    if (widget.formKey.currentState?.validate() == true) {
+      try {
+        final user = await authService.signIn(
+          email: emailTextController.text.trim(),
+          password: passwordTextController.text.trim(),
+        );
+
+        if (user?.accountType != AccountType.business) {
+          throw Exception('Account type is not business');
+        }
+
+        if (!mounted) return;
+        Navigator.popUntil(context, ModalRoute.withName('/auth'));
+      } catch (error) {
+        String message = authService.handleFirebaseError(error);
+        showSnackbar(context, message);
+      }
     }
   }
 
-  void _onForgotPassword() {
-    if (_emailInput.text.isNotEmpty) {
-      FirebaseAuth.instance.sendPasswordResetEmail(email: _emailInput.text);
-      showSnackBarText('Reset link sent to your email');
+  void onForgotPassword() async {
+    if (emailTextController.text.isNotEmpty) {
+      try {
+        authService.sendPasswordResetEmail(emailTextController.text);
+        if (!mounted) return;
+        showSnackbar(context, 'Reset link sent to your email');
+      } catch (error) {
+        showSnackbar(context, error.toString());
+      }
     } else {
-      showSnackBarText('Enter email to send reset link');
+      showSnackbar(context, 'Enter email to send reset link');
     }
   }
 
-  void _onSignUpPress(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => BusinessSignupPage()),
-    );
-  }
-
-  void showSnackBarText(String text) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-      ),
-    );
+  void onSignUpPress(BuildContext context) {
+    Navigator.pushNamed(context, '/business-signup');
   }
 
   @override
@@ -99,13 +114,13 @@ class _BusinessLoginPageState extends State<BusinessLoginPage> {
                 ),
                 const Padding(padding: EdgeInsets.all(16.0)),
                 Form(
-                  key: widget._formKey,
+                  key: widget.formKey,
                   child: Column(
                     children: [
                       TextFormField(
                         validator: validateEmail,
                         keyboardType: TextInputType.emailAddress,
-                        controller: _emailInput,
+                        controller: emailTextController,
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(
@@ -129,8 +144,8 @@ class _BusinessLoginPageState extends State<BusinessLoginPage> {
                       const Padding(padding: EdgeInsets.all(8.0)),
                       TextFormField(
                         validator: validatePassword,
-                        controller: _passwordInput,
-                        obscureText: _isHidden,
+                        controller: passwordTextController,
+                        obscureText: isPasswordHidden,
                         keyboardType: TextInputType.visiblePassword,
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(
@@ -141,11 +156,11 @@ class _BusinessLoginPageState extends State<BusinessLoginPage> {
                           labelText: 'Password',
                           suffixIcon: IconButton(
                             icon: Icon(
-                                _isHidden
+                                isPasswordHidden
                                     ? Icons.visibility
                                     : Icons.visibility_off,
                                 color: Colors.black54),
-                            onPressed: _togglePasswordView,
+                            onPressed: togglePasswordView,
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: const BorderSide(
@@ -171,15 +186,15 @@ class _BusinessLoginPageState extends State<BusinessLoginPage> {
                     Row(
                       children: [
                         Checkbox(
-                          value: _rememberChecked,
-                          onChanged: (value) => _setRemember(value),
+                          value: rememberChecked,
+                          onChanged: (value) => setRemember(value),
                           activeColor: const Color.fromARGB(255, 255, 0, 0),
                         ),
                         const Text("Remember Me")
                       ],
                     ),
                     TextButton(
-                      onPressed: _onForgotPassword,
+                      onPressed: onForgotPassword,
                       style: TextButton.styleFrom(
                         primary: const Color.fromARGB(255, 255, 0, 0),
                       ),
@@ -190,7 +205,7 @@ class _BusinessLoginPageState extends State<BusinessLoginPage> {
                 const Padding(padding: EdgeInsets.all(8.0)),
                 Center(
                   child: ElevatedButton(
-                    onPressed: _onLogin,
+                    onPressed: onLogin,
                     style: buttonStyle,
                     child: const Text(
                       "Login",
@@ -206,7 +221,7 @@ class _BusinessLoginPageState extends State<BusinessLoginPage> {
                       style: TextStyle(fontSize: 16.0),
                     ),
                     TextButton(
-                      onPressed: () => _onSignUpPress(context),
+                      onPressed: () => onSignUpPress(context),
                       style: TextButton.styleFrom(
                           primary: const Color.fromARGB(255, 255, 0, 0)),
                       child: const Text(

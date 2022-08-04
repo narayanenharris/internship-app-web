@@ -1,4 +1,8 @@
+import 'package:app/models/user.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/utils/helper.dart';
+import 'package:app/utils/authentication_service.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key? key}) : super(key: key);
@@ -8,6 +12,24 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  late AuthenticationService authService;
+  UserObject? user;
+
+  @override
+  void initState() {
+    super.initState();
+    authService = context.read<AuthenticationService>();
+    getUserData();
+  }
+
+  void getUserData() async {
+    final userObject = await authService.getUser();
+
+    setState(() {
+      user = userObject;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -29,18 +51,18 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 const SizedBox(width: 20),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'Name',
-                      style: TextStyle(
+                      user != null ? user!.fullName : "No User Found",
+                      style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'mail@domain.com',
-                      style: TextStyle(
+                      user != null ? user!.email : "No User Found",
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white,
                       ),
@@ -53,7 +75,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ListTile(
             leading: const Icon(Icons.query_stats),
             iconColor: Colors.white,
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/dashboard');
+            },
             title: const Text(
               'Dashboard',
               style: TextStyle(color: Colors.white),
@@ -134,7 +158,15 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ListTile(
             leading: const Icon(Icons.logout),
             iconColor: Colors.white,
-            onTap: () {},
+            onTap: () async {
+              try {
+                await context.read<AuthenticationService>().signOut();
+                if (!mounted) return;
+                Navigator.popUntil(context, ModalRoute.withName('/auth'));
+              } catch (error) {
+                showSnackbar(context, error.toString());
+              }
+            },
             title: const Text(
               'Logout',
               style: TextStyle(color: Colors.white),

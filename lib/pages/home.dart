@@ -12,8 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    final double categoryHeight =
-        MediaQuery.of(context).size.height * 0.30 - 50;
+    final double itemHeight = MediaQuery.of(context).size.height * 0.30 - 50;
 
     return Scaffold(
       appBar: AppBar(
@@ -56,7 +55,7 @@ class _HomePageState extends State<HomePage> {
                         Container(
                           width: 150,
                           margin: const EdgeInsets.only(right: 20),
-                          height: categoryHeight,
+                          height: itemHeight,
                           decoration: const BoxDecoration(
                             color: Colors.red,
                             borderRadius: BorderRadius.all(
@@ -93,7 +92,7 @@ class _HomePageState extends State<HomePage> {
                         Container(
                           width: 150,
                           margin: const EdgeInsets.only(right: 20),
-                          height: categoryHeight,
+                          height: itemHeight,
                           decoration: BoxDecoration(
                             color: Colors.redAccent.shade400,
                             borderRadius: const BorderRadius.all(
@@ -130,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                         Container(
                           width: 150,
                           margin: const EdgeInsets.only(right: 20),
-                          height: categoryHeight,
+                          height: itemHeight,
                           decoration: BoxDecoration(
                             color: Colors.red.shade800,
                             borderRadius: const BorderRadius.all(

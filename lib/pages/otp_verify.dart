@@ -1,60 +1,62 @@
 import 'dart:async';
-import 'package:app/pages/home.dart';
+import 'package:app/models/user.dart';
+import 'package:provider/provider.dart';
+import 'package:pinput/pinput.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sms_autofill/sms_autofill.dart';
 import 'package:app/styles/buttton.dart';
+import 'package:app/utils/helper.dart';
+import 'package:app/utils/authentication_service.dart';
+
+class OtpVerifyPageArguments {
+  final UserObject user;
+  final String mobile;
+  final String password;
+
+  OtpVerifyPageArguments({
+    required this.user,
+    required this.mobile,
+    required this.password,
+  });
+}
 
 class OtpVerifyPage extends StatefulWidget {
-  const OtpVerifyPage({
-    Key? key,
-    required this.fullName,
-    required this.dateOfBirth,
-    required this.mobile,
-    required this.email,
-    required this.password,
-    required this.referralCode,
-    required this.user,
-  }) : super(key: key);
-
-  final String fullName;
-  final String dateOfBirth;
-  final String mobile;
-  final String email;
-  final String password;
-  final String referralCode;
-  final UserCredential user;
+  const OtpVerifyPage({Key? key}) : super(key: key);
 
   @override
   State<OtpVerifyPage> createState() => _OtpVerifyPageState();
 }
 
 class _OtpVerifyPageState extends State<OtpVerifyPage> {
+  late AuthenticationService authService;
+  late OtpVerifyPageArguments args;
   int seconds = 30;
   String countryCode = '+91';
   String verificationId = '';
   int? resendToken;
-  String _smsCode = '';
-  late Timer _timer;
+  String smsCode = '';
+  late Timer timer;
 
   @override
   void initState() {
     super.initState();
-    _startTime();
-    _verifyPhoneNumber();
+    startTime();
+    verifyPhoneNumber();
+    args = ModalRoute.of(context)?.settings.arguments as OtpVerifyPageArguments;
+    authService = context.read<AuthenticationService>();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _timer.cancel();
+    timer.cancel();
   }
 
-  void _startTime() async {
+  void startTime() async {
     var duration = const Duration(seconds: 1);
     seconds = 30;
 
-    _timer = Timer.periodic(duration, (timer) {
+    timer = Timer.periodic(duration, (timer) {
       setState(() {
         if (seconds > 0) {
           seconds = seconds - 1;
@@ -63,69 +65,52 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
     });
   }
 
-  void _resendOtp() {
-    _startTime();
-    _verifyPhoneNumber();
+  void resendOtp() {
+    startTime();
+    verifyPhoneNumber();
   }
 
-  void _verifyPhoneNumber() async {
-    await SmsAutoFill().listenForCode();
-
+  void verifyPhoneNumber() async {
     try {
       FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: countryCode + widget.mobile,
+        phoneNumber: countryCode + args.mobile,
         timeout: const Duration(seconds: 30),
         forceResendingToken: resendToken,
         verificationCompleted: (PhoneAuthCredential credential) {
-          showSnackBarText("Auth Completed!");
+          showSnackbar(context, "Auth Completed!");
         },
         verificationFailed: (FirebaseAuthException e) {
-          showSnackBarText("Auth Failed!");
+          showSnackbar(context, "Auth Failed!");
         },
         codeSent: (String verificationId, int? resendToken) async {
-          showSnackBarText("OTP Sent!");
+          showSnackbar(context, "OTP Sent!");
           this.verificationId = verificationId;
           this.resendToken = resendToken;
         },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          showSnackBarText("Timeout!");
-        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
       );
     } catch (error) {
-      showSnackBarText(error.toString());
+      if (!mounted) return;
+      showSnackbar(context, error.toString());
     }
   }
 
-  void _onSubmit() async {
+  void onSubmit() async {
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
-        smsCode: _smsCode,
+        smsCode: smsCode,
       );
 
-      await widget.user.user?.updatePhoneNumber(credential);
-
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: widget.email,
-        password: widget.password,
-      );
+      await args.user.userCredential?.updatePhoneNumber(credential);
+      authService.signIn(email: args.user.email, password: args.password);
 
       if (!mounted) return;
-
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      Navigator.popUntil(context, ModalRoute.withName('/auth'));
     } catch (error) {
-      showSnackBarText(error.toString());
+      String message = authService.handleFirebaseError(error);
+      showSnackbar(context, message);
     }
-  }
-
-  void showSnackBarText(String text) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-      ),
-    );
   }
 
   @override
@@ -186,30 +171,42 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                     ),
                     Flexible(
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 150),
-                        child: PinFieldAutoFill(
-                          currentCode: _smsCode,
-                          autoFocus: true,
-                          decoration: const UnderlineDecoration(
-                            colorBuilder: FixedColorBuilder(Colors.white),
-                            textStyle: TextStyle(color: Colors.white),
+                        constraints: const BoxConstraints(maxWidth: 200),
+                        child: Pinput(
+                          length: 6,
+                          validator: (s) =>
+                              s?.length == 6 ? null : 'Pin not valid',
+                          pinputAutovalidateMode:
+                              PinputAutovalidateMode.onSubmit,
+                          androidSmsAutofillMethod:
+                              AndroidSmsAutofillMethod.smsUserConsentApi,
+                          errorTextStyle: const TextStyle(
+                            color: Colors.white,
                           ),
-                          onCodeChanged: (code) {
-                            if (code!.length == 6) {
-                              FocusScope.of(context).requestFocus(
-                                FocusNode(),
-                              );
-                            }
-                            _smsCode = code;
-                          },
+                          onChanged: (value) => {smsCode = value},
+                          cursor: null,
+                          defaultPinTheme: PinTheme(
+                            width: 56,
+                            height: 56,
+                            textStyle: const TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white),
+                              backgroundBlendMode: BlendMode.colorBurn,
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          showCursor: true,
+                          onCompleted: (pin) => onSubmit(),
                         ),
                       ),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                    ),
                     TextButton(
-                      onPressed: seconds == 0 ? _resendOtp : null,
+                      onPressed: seconds == 0 ? resendOtp : null,
                       child: Text(
                         seconds == 0 ? "Resend OTP" : "Resend in $seconds sec",
                         style: const TextStyle(
@@ -222,7 +219,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                     ),
                     Center(
                       child: ElevatedButton(
-                        onPressed: _onSubmit,
+                        onPressed: onSubmit,
                         style: buttonStyleRed,
                         child: const Text(
                           "Submit",

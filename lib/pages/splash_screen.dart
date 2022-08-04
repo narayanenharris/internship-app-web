@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:app/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
+
+const String loggedInKey = 'LoggedIn';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -13,19 +14,16 @@ class StartState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    startTime();
+    checkAuth();
   }
 
-  startTime() async {
-    var duration = const Duration(seconds: 3);
-    return Timer(duration, route);
-  }
-
-  route() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const WelcomePage()),
-    );
+  void checkAuth() {
+    Timer(const Duration(seconds: 1), () {
+      Navigator.pushReplacementNamed(
+        context,
+        '/auth',
+      );
+    });
   }
 
   @override
