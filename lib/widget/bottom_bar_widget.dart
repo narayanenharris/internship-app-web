@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app/constants/colors.dart';
 
 class BottomBarWidget extends StatefulWidget {
   const BottomBarWidget({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class _BottomBarWidgetState extends State<BottomBarWidget> {
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: false,
       showSelectedLabels: false,
-      selectedItemColor: const Color.fromARGB(255, 255, 0, 0),
+      selectedItemColor: ColorConstants.red,
       elevation: 0,
       items: const [
         BottomNavigationBarItem(

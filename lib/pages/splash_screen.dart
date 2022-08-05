@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:app/constants/colors.dart';
 
 const String loggedInKey = 'LoggedIn';
 
@@ -35,10 +36,7 @@ class StartState extends State<SplashScreen> {
             decoration: const BoxDecoration(
               color: Color.fromARGB(255, 255, 255, 255),
               gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 255, 0, 0),
-                  Color.fromARGB(255, 255, 0, 0)
-                ],
+                colors: [ColorConstants.red, ColorConstants.red],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),

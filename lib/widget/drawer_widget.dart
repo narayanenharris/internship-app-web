@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/utils/helper.dart';
 import 'package:app/utils/authentication_service.dart';
+import 'package:app/constants/colors.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key? key}) : super(key: key);
@@ -33,7 +34,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+      backgroundColor: ColorConstants.red,
       child: ListView(
         children: [
           Padding(
@@ -73,7 +74,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.query_stats),
+            leading: const Icon(Icons.dashboard_customize_rounded),
             iconColor: Colors.white,
             onTap: () {
               Navigator.pushNamed(context, '/dashboard');

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:app/styles/buttton.dart';
 import 'package:app/utils/validation.dart';
 import 'package:app/utils/helper.dart';
+import 'package:app/constants/colors.dart';
 import 'package:provider/provider.dart';
 
 class BusinessLoginPage extends StatefulWidget {
@@ -178,25 +179,15 @@ class _BusinessLoginPageState extends State<BusinessLoginPage> {
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.all(4.0),
+                  padding: EdgeInsets.all(4.0)
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: rememberChecked,
-                          onChanged: (value) => setRemember(value),
-                          activeColor: const Color.fromARGB(255, 255, 0, 0),
-                        ),
-                        const Text("Remember Me")
-                      ],
-                    ),
                     TextButton(
                       onPressed: onForgotPassword,
                       style: TextButton.styleFrom(
-                        primary: const Color.fromARGB(255, 255, 0, 0),
+                        primary: ColorConstants.red,
                       ),
                       child: const Text("Forgot Password"),
                     )
@@ -223,7 +214,7 @@ class _BusinessLoginPageState extends State<BusinessLoginPage> {
                     TextButton(
                       onPressed: () => onSignUpPress(context),
                       style: TextButton.styleFrom(
-                          primary: const Color.fromARGB(255, 255, 0, 0)),
+                          primary: ColorConstants.red,),
                       child: const Text(
                         "Register",
                         style: TextStyle(fontSize: 16.0),

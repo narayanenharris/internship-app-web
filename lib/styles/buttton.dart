@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:app/constants/colors.dart';
 
 ButtonStyle buttonStyle = TextButton.styleFrom(
-  backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+  backgroundColor: ColorConstants.red,
   fixedSize: const Size(160, 36),
   padding: const EdgeInsets.symmetric(horizontal: 18.0),
   shape: const RoundedRectangleBorder(

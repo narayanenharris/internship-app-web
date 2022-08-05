@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app/constants/colors.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dashboard"),
-        backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+        backgroundColor: ColorConstants.red,
       ),
       body: SingleChildScrollView(
         child: Padding(

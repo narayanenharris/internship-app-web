@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:app/styles/buttton.dart';
 import 'package:app/utils/helper.dart';
+import 'package:app/constants/colors.dart';
 import 'package:app/utils/authentication_service.dart';
 
 class OtpVerifyPageArguments {
@@ -40,10 +41,14 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
   @override
   void initState() {
     super.initState();
-    startTime();
-    verifyPhoneNumber();
-    args = ModalRoute.of(context)?.settings.arguments as OtpVerifyPageArguments;
-    authService = context.read<AuthenticationService>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var modalRoute = ModalRoute.of(context);
+      args = modalRoute?.settings.arguments as OtpVerifyPageArguments;
+      authService = context.read<AuthenticationService>();
+      startTime();
+      verifyPhoneNumber();
+    });
   }
 
   @override
@@ -116,7 +121,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+      backgroundColor: ColorConstants.red,
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
@@ -225,7 +230,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                           "Submit",
                           style: TextStyle(
                             fontSize: 20.0,
-                            color: Color.fromARGB(255, 255, 0, 0),
+                            color: ColorConstants.red,
                           ),
                         ),
                       ),

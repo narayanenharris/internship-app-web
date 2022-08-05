@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:app/styles/buttton.dart';
 import 'package:app/utils/validation.dart';
 import 'package:app/utils/authentication_service.dart';
+import 'package:app/constants/colors.dart';
 import 'package:app/utils/helper.dart';
 
 class MemberLoginPage extends StatefulWidget {
@@ -178,26 +179,14 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                     ],
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(4.0),
-                ),
+                const Padding(padding: EdgeInsets.all(4.0)),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: rememberChecked,
-                          onChanged: (value) => setRemember(value),
-                          activeColor: const Color.fromARGB(255, 255, 0, 0),
-                        ),
-                        const Text("Remember Me")
-                      ],
-                    ),
                     TextButton(
                       onPressed: onForgotPassword,
                       style: TextButton.styleFrom(
-                        primary: const Color.fromARGB(255, 255, 0, 0),
+                        primary: ColorConstants.red,
                       ),
                       child: const Text("Forgot Password"),
                     )
@@ -224,7 +213,8 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                     TextButton(
                       onPressed: () => onSignUpPress(context),
                       style: TextButton.styleFrom(
-                          primary: const Color.fromARGB(255, 255, 0, 0)),
+                        primary: ColorConstants.red,
+                      ),
                       child: const Text(
                         "Sign Up",
                         style: TextStyle(fontSize: 16.0),

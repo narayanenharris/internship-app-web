@@ -1,19 +1,22 @@
-import 'package:app/models/user.dart';
-import 'package:app/pages/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:app/pages/home.dart';
-import 'package:app/pages/member_signup.dart';
+import 'package:app/pages/auth/member/member_signup.dart';
+import 'package:app/pages/clubs_and_association.dart';
 import 'package:app/pages/welcome_page.dart';
+import 'package:app/pages/auth/member/member_login.dart';
+import 'package:app/pages/auth/business/business_login.dart';
+import 'package:app/pages/auth/business/business_signup.dart';
+import 'package:app/models/user.dart';
+import 'package:app/pages/dashboard.dart';
+import 'package:app/pages/home/home_wrapper.dart';
 import 'package:app/pages/splash_screen.dart';
-import 'package:app/pages/business_login.dart';
-import 'package:app/pages/business_signup.dart';
-import 'package:app/pages/member_login.dart';
-import 'package:app/pages/otp_verify.dart';
-import 'package:app/pages/authentication_wrapper.dart';
+import 'package:app/pages/subscription.dart';
+import 'package:app/pages/auth/otp_verify.dart';
+import 'package:app/pages/auth/authentication_wrapper.dart';
+import 'package:app/constants/colors.dart';
 import 'package:app/utils/authentication_service.dart';
 
 late UserObject? userObject;
@@ -48,9 +51,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'App',
         theme: ThemeData(
-          primaryColor: const Color.fromARGB(255, 255, 0, 0),
+          primaryColor: ColorConstants.red,
           textSelectionTheme: const TextSelectionThemeData(
-            cursorColor: Color.fromARGB(255, 255, 0, 0),
+            cursorColor: ColorConstants.red,
           ),
         ),
         debugShowCheckedModeBanner: false,
@@ -64,8 +67,10 @@ class MyApp extends StatelessWidget {
           '/business-login': (context) => BusinessLoginPage(),
           '/business-signup': (context) => BusinessSignupPage(),
           '/otp-verify': (context) => const OtpVerifyPage(),
-          '/home': (context) => const HomePage(),
+          '/home': (context) => const HomeWrapper(),
           '/dashboard': (context) => const DashboardPage(),
+          '/subscription': (context) => const SubscriptionPage(),
+          '/clubs-associations': (context) => const ClubsAndAssociationsPage(),
         },
       ),
     );

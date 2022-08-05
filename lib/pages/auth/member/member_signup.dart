@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:app/models/user.dart';
-import 'package:app/pages/otp_verify.dart';
-import 'package:app/utils/validation.dart';
-import 'package:app/utils/helper.dart';
 import 'package:app/utils/authentication_service.dart';
+import 'package:app/utils/validation.dart';
+import 'package:app/pages/auth/otp_verify.dart';
+import 'package:app/utils/helper.dart';
+import 'package:app/constants/colors.dart';
 import 'package:app/styles/buttton.dart';
 
-class BusinessSignupPage extends StatefulWidget {
-  BusinessSignupPage({Key? key}) : super(key: key);
+class MemberSignupPage extends StatefulWidget {
+  MemberSignupPage({Key? key}) : super(key: key);
 
   final formKey = GlobalKey<FormState>();
 
   @override
-  State<BusinessSignupPage> createState() => _BusinessSignupPageState();
+  State<MemberSignupPage> createState() => _MemberSignupPageState();
 }
 
-class _BusinessSignupPageState extends State<BusinessSignupPage> {
+class _MemberSignupPageState extends State<MemberSignupPage> {
   late AuthenticationService authService;
   bool isPasswordHidden = true;
-  String? dropDownError;
   final fullNameTextController = TextEditingController();
   final dateOfBirthTextController = TextEditingController();
   final mobileTextController = TextEditingController();
@@ -28,34 +28,6 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
   final passwordTextController = TextEditingController();
   final confirmPasswordTextController = TextEditingController();
   final referralCodeTextController = TextEditingController();
-  String? currentSelectedValue;
-
-  final _categories = [
-    "Hotel",
-    "Club",
-    "Resort",
-    "Saloon",
-    "Parlour",
-    "Service Apartments",
-    "Textile",
-    "Jewellery Shop",
-    "SPA",
-    "Marriage Hall",
-    "Provision Bazzar",
-    "Restaurant",
-    "Cinema Online Tickets",
-    "Online Discount Shopping",
-    "Tours & Travels",
-    "Gym",
-    "Online Recharge",
-    "Others",
-    "Hotels and Resorts",
-    "Electronices",
-    "Mobile Phones",
-    "Launday Services",
-    "Medicines",
-    "Beach Resort"
-  ];
 
   @override
   void initState() {
@@ -64,18 +36,6 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
   }
 
   void onSignup(BuildContext context) async {
-    setState(() {
-      if (currentSelectedValue == null) {
-        dropDownError = 'Select a category';
-      } else {
-        dropDownError = null;
-      }
-    });
-
-    if (dropDownError != null) {
-      return;
-    }
-
     if (widget.formKey.currentState?.validate() == true) {
       UserObject? user;
 
@@ -84,10 +44,10 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
           email: emailTextController.text.trim(),
           password: passwordTextController.text.trim(),
           displayName: fullNameTextController.text.trim(),
+          accountType: AccountType.member,
           dateOfBirth: dateOfBirthTextController.text.trim(),
           referralCode: referralCodeTextController.text.trim(),
-          accountType: AccountType.business,
-          category: currentSelectedValue,
+          category: null,
         );
       } catch (error) {
         showSnackbar(context, error.toString());
@@ -100,8 +60,8 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
         '/otp-verify',
         arguments: OtpVerifyPageArguments(
           user: user,
-          mobile: mobileTextController.text,
-          password: passwordTextController.text,
+          mobile: mobileTextController.text.trim(),
+          password: passwordTextController.text.trim(),
         ),
       );
     }
@@ -149,46 +109,6 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                   key: widget.formKey,
                   child: Column(
                     children: [
-                      FormField<String>(
-                        builder: (FormFieldState<String> state) {
-                          return InputDecorator(
-                            decoration: InputDecoration(
-                              errorText: dropDownError,
-                              hintText: 'Select Category',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                            ),
-                            isEmpty: currentSelectedValue == '',
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: currentSelectedValue,
-                                hint: const Text('Select Category'),
-                                isDense: true,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    currentSelectedValue = newValue;
-                                    state.didChange(newValue);
-                                  });
-                                },
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(20.0),
-                                ),
-                                isExpanded: true,
-                                menuMaxHeight: 400.0,
-                                alignment: AlignmentDirectional.centerStart,
-                                items: _categories.map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      const Padding(padding: EdgeInsets.all(8.0)),
                       TextFormField(
                         validator: validateFullName,
                         controller: fullNameTextController,
@@ -251,7 +171,7 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                               return Theme(
                                 data: Theme.of(context).copyWith(
                                   colorScheme: const ColorScheme.light(
-                                    primary: Color.fromARGB(255, 255, 0, 0),
+                                    primary: ColorConstants.red,
                                     onPrimary: Colors.white,
                                     onSurface: Colors.black,
                                   ),
@@ -265,6 +185,7 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                               );
                             },
                           );
+
                           if (pickedDate != null) {
                             setDateInput(pickedDate);
                           }
@@ -353,7 +274,9 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                           ),
                         ),
                       ),
-                      const Padding(padding: EdgeInsets.all(8.0)),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                      ),
                       TextFormField(
                         validator: (value) => validateConfirmPassword(
                           value,
@@ -437,7 +360,7 @@ class _BusinessSignupPageState extends State<BusinessSignupPage> {
                     TextButton(
                       onPressed: () => onLoginPress(context),
                       style: TextButton.styleFrom(
-                        primary: const Color.fromARGB(255, 255, 0, 0),
+                        primary: ColorConstants.red,
                       ),
                       child: const Text(
                         "Login",
