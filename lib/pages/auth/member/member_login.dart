@@ -96,7 +96,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20.0),
-                  child: Image.asset('assets/images/logo.png'),
+                  child: Image.asset('assets/images/New-logo-red.png'),
                 ),
                 const Padding(padding: EdgeInsets.all(8.0)),
                 const Text(
