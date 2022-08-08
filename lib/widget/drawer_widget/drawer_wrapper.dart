@@ -12,10 +12,10 @@ class DrawerWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<UserObject?>();
 
-    if (firebaseUser?.accountType != AccountType.business) {
-      return const DrawerWidgetBusiness();
+    if (firebaseUser?.accountType == AccountType.member) {
+      return const DrawerWidgetMember();
     }
 
-    return const DrawerWidgetMember();
+    return const DrawerWidgetBusiness();
   }
 }

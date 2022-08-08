@@ -12,10 +12,10 @@ class OnBoardingMember extends StatefulWidget {
 class _OnBoardingMemberState extends State<OnBoardingMember> {
   final controller = PageController();
   bool isLastPage = false;
+
   @override
   void dispose() {
     controller.dispose();
-
     super.dispose();
   }
 
@@ -89,7 +89,7 @@ class _OnBoardingMemberState extends State<OnBoardingMember> {
                   final prefs = await SharedPreferences.getInstance();
                   prefs.setBool('show', true);
                   if (!mounted) return;
-                  Navigator.pushNamed(context, '/home');
+                  Navigator.pushReplacementNamed(context, '/bottom-bar');
                 },
               )
             : Container(

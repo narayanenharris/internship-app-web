@@ -23,8 +23,9 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: const Text("My Account"),
         backgroundColor: const Color.fromARGB(255, 255, 0, 0),
-        leading: const BackButton(
-          color: Color.fromARGB(255, 251, 240, 240),
+        leading: BackButton(
+          color: const Color.fromARGB(255, 251, 240, 240),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Center(
@@ -226,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             "Married",
                             style: TextStyle(
                                 fontSize: 15,
-                                color: Color.fromARGB(255, 1, 1, 1)),
+                                color: Color.fromARGB(255, 1, 1, 1),),
                           ),
                           Radio(
                             value: "Unmarried",
@@ -240,7 +241,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             "Unmarried",
                             style: TextStyle(
                                 fontSize: 15,
-                                color: Color.fromARGB(255, 1, 1, 1)),
+                                color: Color.fromARGB(255, 1, 1, 1),),
                           )
                         ],
                       ),

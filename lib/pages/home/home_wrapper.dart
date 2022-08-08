@@ -13,7 +13,7 @@ class HomeWrapper extends StatelessWidget {
     final firebaseUser = context.watch<UserObject?>();
 
     if (firebaseUser?.accountType == AccountType.member) {
-      return const HomePage();
+      return const MemberHomePage();
     }
 
     return const BusinessHomePage();

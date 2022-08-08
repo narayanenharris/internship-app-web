@@ -111,7 +111,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
       authService.signIn(email: args.user.email, password: args.password);
 
       if (!mounted) return;
-      Navigator.popUntil(context, ModalRoute.withName('/auth'));
+      Navigator.pushNamedAndRemoveUntil(context, "/onboarding", (r) => false);
     } catch (error) {
       String message = authService.handleFirebaseError(error);
       showSnackbar(context, message);

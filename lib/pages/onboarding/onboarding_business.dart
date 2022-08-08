@@ -97,7 +97,7 @@ class _OnBoardingBusinessState extends State<OnBoardingBusiness> {
                   final prefs = await SharedPreferences.getInstance();
                   prefs.setBool('show', true);
                   if (!mounted) return;
-                  Navigator.pushNamed(context, '/home');
+                  Navigator.pushReplacementNamed(context, '/bottom-bar');
                 },
               )
             : Container(
@@ -136,7 +136,10 @@ class _OnBoardingBusinessState extends State<OnBoardingBusiness> {
                       ),
                       child: const Text(
                         "NEXT",
-                        style: TextStyle(color: Colors.red, fontSize: 20),
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
                   ],

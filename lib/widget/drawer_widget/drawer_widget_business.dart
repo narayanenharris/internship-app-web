@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/utils/helper.dart';
+import 'package:app/models/user.dart';
+import 'package:app/utils/authentication_service.dart';
+import 'package:app/constants/colors.dart';
 
 class DrawerWidgetBusiness extends StatefulWidget {
   const DrawerWidgetBusiness({Key? key}) : super(key: key);
@@ -8,10 +13,28 @@ class DrawerWidgetBusiness extends StatefulWidget {
 }
 
 class _DrawerWidgetBusinessState extends State<DrawerWidgetBusiness> {
+  late AuthenticationService authService;
+  UserObject? user;
+
+  @override
+  void initState() {
+    super.initState();
+    authService = context.read<AuthenticationService>();
+    getUserData();
+  }
+
+  void getUserData() async {
+    final userObject = await authService.getUser();
+
+    setState(() {
+      user = userObject;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+      backgroundColor: ColorConstants.red,
       child: ListView(
         children: [
           Padding(
@@ -22,25 +45,26 @@ class _DrawerWidgetBusinessState extends State<DrawerWidgetBusiness> {
             ),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white,
+                const Icon(
+                  Icons.account_circle,
+                  size: 64.0,
+                  color: Colors.white,
                 ),
                 const SizedBox(width: 20),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'Name',
-                      style: TextStyle(
+                      user != null ? user!.fullName : "No User Found",
+                      style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'mail@domain.com',
-                      style: TextStyle(
+                      user != null ? user!.email : "No User Found",
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white,
                       ),
@@ -125,7 +149,9 @@ class _DrawerWidgetBusinessState extends State<DrawerWidgetBusiness> {
           ListTile(
             leading: const Icon(Icons.settings),
             iconColor: Colors.white,
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/profile');
+            },
             title: const Text(
               'Settings',
               style: TextStyle(color: Colors.white),
@@ -134,7 +160,15 @@ class _DrawerWidgetBusinessState extends State<DrawerWidgetBusiness> {
           ListTile(
             leading: const Icon(Icons.logout),
             iconColor: Colors.white,
-            onTap: () {},
+            onTap: () async {
+              try {
+                await context.read<AuthenticationService>().signOut();
+                if (!mounted) return;
+                Navigator.popUntil(context, ModalRoute.withName('/auth'));
+              } catch (error) {
+                showSnackbar(context, error.toString());
+              }
+            },
             title: const Text(
               'Logout',
               style: TextStyle(color: Colors.white),

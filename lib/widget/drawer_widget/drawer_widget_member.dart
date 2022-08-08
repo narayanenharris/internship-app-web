@@ -1,5 +1,4 @@
 import 'package:app/models/user.dart';
-import 'package:app/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/utils/helper.dart';
@@ -46,9 +45,10 @@ class _DrawerWidgetMemberState extends State<DrawerWidgetMember> {
             ),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white,
+                const Icon(
+                  Icons.account_circle,
+                  size: 64.0,
+                  color: Colors.white,
                 ),
                 const SizedBox(width: 20),
                 Column(
@@ -166,12 +166,7 @@ class _DrawerWidgetMemberState extends State<DrawerWidgetMember> {
             leading: const Icon(Icons.settings),
             iconColor: Colors.white,
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfilePage(),
-                ),
-              );
+              Navigator.pushNamed(context, '/profile');
             },
             title: const Text(
               'Settings',
