@@ -12,6 +12,8 @@ class AuthenticationWrapper extends StatelessWidget {
     final firebaseUser = context.watch<UserObject?>();
 
     if (firebaseUser != null) {
+      if (firebaseUser.userCredential?.phoneNumber == null) {}
+
       return const BottomBarPage();
     }
 

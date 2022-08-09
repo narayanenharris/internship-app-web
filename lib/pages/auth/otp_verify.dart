@@ -33,9 +33,9 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
   late OtpVerifyPageArguments args;
   int seconds = 30;
   String countryCode = '+91';
+  final pinController = TextEditingController();
   String verificationId = '';
   int? resendToken;
-  String smsCode = '';
   late Timer timer;
 
   @override
@@ -82,7 +82,8 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
         timeout: const Duration(seconds: 30),
         forceResendingToken: resendToken,
         verificationCompleted: (PhoneAuthCredential credential) {
-          showSnackbar(context, "Auth Completed!");
+          pinController.setText(credential.smsCode ?? '');
+          loginUser(credential);
         },
         verificationFailed: (FirebaseAuthException e) {
           showSnackbar(context, "Auth Failed!");
@@ -101,15 +102,18 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
   }
 
   void onSubmit() async {
-    try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: pinController.text,
+    );
 
+    loginUser(credential);
+  }
+
+  void loginUser(PhoneAuthCredential credential) async {
+    try {
       await args.user.userCredential?.updatePhoneNumber(credential);
       authService.signIn(email: args.user.email, password: args.password);
-
       if (!mounted) return;
       Navigator.pushNamedAndRemoveUntil(context, "/onboarding", (r) => false);
     } catch (error) {
@@ -179,16 +183,14 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                         constraints: const BoxConstraints(maxWidth: 200),
                         child: Pinput(
                           length: 6,
+                          controller: pinController,
                           validator: (s) =>
                               s?.length == 6 ? null : 'Pin not valid',
                           pinputAutovalidateMode:
                               PinputAutovalidateMode.onSubmit,
-                          androidSmsAutofillMethod:
-                              AndroidSmsAutofillMethod.smsUserConsentApi,
                           errorTextStyle: const TextStyle(
                             color: Colors.white,
                           ),
-                          onChanged: (value) => {smsCode = value},
                           cursor: null,
                           defaultPinTheme: PinTheme(
                             width: 56,
@@ -206,7 +208,6 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                             ),
                           ),
                           showCursor: true,
-                          onCompleted: (pin) => onSubmit(),
                         ),
                       ),
                     ),

@@ -17,7 +17,7 @@ class BottomBarPage extends StatefulWidget {
 class _BottomBarPageState extends State<BottomBarPage> {
   int selectedIndex = 0;
 
-  static const List<Widget> pages = <Widget>[
+  static const List<Widget> pages = [
     HomeWrapper(),
     BookingsPage(),
     WalletPage(),
@@ -25,7 +25,7 @@ class _BottomBarPageState extends State<BottomBarPage> {
     SupportPage(),
   ];
 
-  static const List<String> items = <String>[
+  static const List<String> items = [
     'Home',
     'Bookings',
     'Wallet',
