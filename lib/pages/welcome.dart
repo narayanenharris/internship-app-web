@@ -1,85 +1,80 @@
+import 'package:app/web_widgets/bottom_bar.dart';
+import 'package:app/web_widgets/carousel.dart';
+import 'package:app/web_widgets/featured_heading.dart';
+import 'package:app/web_widgets/featured_tiles.dart';
+import 'package:app/web_widgets/floating_quick_access.dart';
+import 'package:app/web_widgets/main_heading.dart';
+import 'package:app/web_widgets/top_bar_contents.dart';
+import 'package:app/web_widgets/top_carousel.dart';
 import 'package:flutter/material.dart';
-import 'package:app/constants/colors.dart';
 
-class WelcomePage extends StatelessWidget {
-  const WelcomePage({Key? key}) : super(key: key);
+class WelcomePage extends StatefulWidget {
+  @override
+  _WelcomePageState createState() => _WelcomePageState();
+}
 
-  void _onMemberLogin(BuildContext context) {
-    Navigator.pushNamed(context, '/member-login');
+class _WelcomePageState extends State<WelcomePage> {
+  final ScrollController _scrollController = ScrollController();
+  double _scrollPosition = 0;
+  double _opacity = 0;
+
+  _scrollListener() {
+    setState(() {
+      _scrollPosition = _scrollController.position.pixels;
+    });
   }
 
-  void _onBusinessLogin(BuildContext context) {
-    Navigator.pushNamed(context, '/business-login');
+  @override
+  void initState() {
+    _scrollController.addListener(_scrollListener);
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    _opacity = _scrollPosition < screenSize.height * 0.40
+        ? _scrollPosition / (screenSize.height * 0.40)
+        : 1;
+
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: 48.0,
-              left: 16.0,
-              right: 16.0,
-              bottom: 20.0,
+      extendBodyBehindAppBar: true,
+      appBar: screenSize.width < 800
+          ? AppBar()
+          : PreferredSize(
+              preferredSize: Size(screenSize.width, 70),
+              child: TopBarContents(_opacity),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        controller: _scrollController,
+        child: Column(
+          children: [
+            Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
-                  child: Image.asset('assets/images/New-logo-red.png'),
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(25.0),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Align(alignment: Alignment.center),
-                    // the login button
-                    MaterialButton(
-                      minWidth: 250.0,
-                      height: 60,
-                      onPressed: () => _onMemberLogin(context),
-                      // defining the shape
-                      shape: RoundedRectangleBorder(
-                        side: const BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: const Text(
-                        "Member",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                        ),
-                      ),
+                Center(
+                  child: SizedBox(
+                    height: screenSize.height * 0.65,
+                    width: screenSize.width * 0.3,
+                    child: Image.asset(
+                      'assets/images/New-logo.png',
+                      fit: BoxFit.cover,
                     ),
-                    // creating the signup button
-                    const SizedBox(height: 20),
-                    MaterialButton(
-                      minWidth: 250.0,
-                      height: 60,
-                      onPressed: () => _onBusinessLogin(context),
-                      color: ColorConstants.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: const Text(
-                        "Business",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                  ),
+                ),
+                Column(children: [
+                  FloatingQuickAccessBar(screenSize: screenSize),
+                  MainCarousel2(),
+                  FeaturedHeading(screenSize: screenSize),
+                  FeaturedTiles(screenSize: screenSize),
+                  MainHeading(screenSize: screenSize),
+                  SizedBox(
+                    height: screenSize.height / 10,
+                  ),
+                  const BottomBar(),
+                ]),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -17,6 +17,6 @@ class AuthenticationWrapper extends StatelessWidget {
       return const BottomBarPage();
     }
 
-    return const WelcomePage();
+    return WelcomePage();
   }
 }

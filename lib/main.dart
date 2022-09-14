@@ -25,7 +25,16 @@ late UserObject? userObject;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+        apiKey: "AIzaSyAFrcYJ4E7-UInmmBpFzCGG_0s2fELiOZA",
+        authDomain: "mill-1928f.firebaseapp.com",
+        projectId: "mill-1928f",
+        storageBucket: "mill-1928f.appspot.com",
+        messagingSenderId: "85894204754",
+        appId: "1:85894204754:web:2ed746a83253935985be8b",
+        measurementId: "G-FHVPR6CZ54"),
+  );
   userObject = await AuthenticationService.init();
   runApp(const MyApp());
 }
@@ -53,6 +62,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'App',
         theme: ThemeData(
+          visualDensity: VisualDensity.adaptivePlatformDensity,
           primaryColor: ColorConstants.red,
           textSelectionTheme: const TextSelectionThemeData(
             cursorColor: ColorConstants.red,
@@ -61,9 +71,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: '/',
         routes: {
-          '/': (context) => const SplashScreen(),
+          '/': (context) => WelcomePage(),
+          '/Splash': (context) => const SplashScreen(),
           '/auth': (context) => const AuthenticationWrapper(),
-          '/welcome': (context) => const WelcomePage(),
           '/member-login': (context) => MemberLoginPage(),
           '/member-signup': (context) => MemberSignupPage(),
           '/business-login': (context) => BusinessLoginPage(),

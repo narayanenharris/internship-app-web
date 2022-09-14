@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "firebase": "^9.9.2",
+    "firebase-tools": "^11.6.0"
+  },
+  "name": "internship-app-web",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jack-coder-25/internship-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jack-coder-25/internship-app/issues"
+  },
+  "homepage": "https://github.com/jack-coder-25/internship-app#readme",
+  "description": ""
+}

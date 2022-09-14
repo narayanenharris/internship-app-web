@@ -84,33 +84,6 @@ class _DrawerWidgetBusinessState extends State<DrawerWidgetBusiness> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.discount),
-            iconColor: Colors.white,
-            onTap: () {},
-            title: const Text(
-              'Offers',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.percent),
-            iconColor: Colors.white,
-            onTap: () {},
-            title: const Text(
-              'Your Coupons',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.percent),
-            iconColor: Colors.white,
-            onTap: () {},
-            title: const Text(
-              'Additional Coupons',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          ListTile(
             leading: const Icon(Icons.group),
             iconColor: Colors.white,
             onTap: () {},
@@ -120,29 +93,29 @@ class _DrawerWidgetBusinessState extends State<DrawerWidgetBusiness> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.gamepad),
+            leading: const Icon(Icons.subscriptions),
             iconColor: Colors.white,
             onTap: () {},
             title: const Text(
-              'Lucky Draw',
+              'Package Subscription',
               style: TextStyle(color: Colors.white),
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.handshake),
+            leading: const Icon(Icons.notifications),
             iconColor: Colors.white,
             onTap: () {},
             title: const Text(
-              'Our Partner',
+              'Notifications',
               style: TextStyle(color: Colors.white),
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.upgrade),
+            leading: const Icon(Icons.group),
             iconColor: Colors.white,
             onTap: () {},
             title: const Text(
-              'Upgrade',
+              'Your Referrals',
               style: TextStyle(color: Colors.white),
             ),
           ),
